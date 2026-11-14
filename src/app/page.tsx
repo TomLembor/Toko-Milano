@@ -1,17 +1,14 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   categories,
   isProduct,
   type Category,
   type Product,
 } from "@/lib/products";
-
-type Profile = {
-  name: string;
-  whatsapp: string;
-};
+import { StoreShell } from "./store-shell";
+import { useStorefrontState } from "./storefront-state";
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("id-ID", {
@@ -19,8 +16,6 @@ const formatPrice = (value: number) =>
     currency: "IDR",
     maximumFractionDigits: 0,
   }).format(value);
-
-const emptyProfile: Profile = { name: "", whatsapp: "" };
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -30,10 +25,7 @@ export default function Home() {
     "loading" | "ready" | "error"
   >("loading");
   const [catalogAttempt, setCatalogAttempt] = useState(0);
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [profile, setProfile] = useState<Profile>(emptyProfile);
-  const [profileReady, setProfileReady] = useState(false);
-  const [profileMessage, setProfileMessage] = useState("");
+  const { quantities, setQuantities, profile } = useStorefrontState();
   const cartDialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -63,34 +55,6 @@ export default function Home() {
     void loadCatalog();
     return () => controller.abort();
   }, [catalogAttempt]);
-
-  useEffect(() => {
-    try {
-      const savedProfile = window.localStorage.getItem("toko-milano-profile");
-      if (savedProfile) {
-        const parsedProfile: unknown = JSON.parse(savedProfile);
-        if (
-          typeof parsedProfile === "object" &&
-          parsedProfile !== null &&
-          "name" in parsedProfile &&
-          "whatsapp" in parsedProfile &&
-          typeof parsedProfile.name === "string" &&
-          typeof parsedProfile.whatsapp === "string"
-        ) {
-          setProfile({
-            name: parsedProfile.name,
-            whatsapp: parsedProfile.whatsapp,
-          });
-        } else {
-          setProfileMessage("Data profil tersimpan tidak dapat dibaca.");
-        }
-      }
-    } catch {
-      setProfileMessage("Profil tidak dapat dimuat dari penyimpanan perangkat.");
-    } finally {
-      setProfileReady(true);
-    }
-  }, []);
 
   const visibleProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("id-ID");
@@ -147,83 +111,14 @@ export default function Home() {
     });
   }
 
-  function saveProfile(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    try {
-      window.localStorage.setItem(
-        "toko-milano-profile",
-        JSON.stringify(profile),
-      );
-      setProfileMessage("Profil tersimpan di perangkat ini.");
-    } catch {
-      setProfileMessage("Profil tidak dapat disimpan di perangkat ini.");
-    }
-  }
-
   return (
-    <>
-      <div className="preview-notice">
-        <p>
-          Pratinjau toko: produk, harga, dan stok di halaman ini adalah contoh.
-        </p>
-      </div>
-
-      <header className="site-header">
-        <a className="brand" href="#beranda" aria-label="Toko Milano, ke beranda">
-          <span className="brand-mark" aria-hidden="true">
-            M
-          </span>
-          <span>
-            <strong>Toko Milano</strong>
-            <small>Kebutuhan harian</small>
-          </span>
-        </a>
-        <p className="store-status">
-          <span className="status-mark" aria-hidden="true" />
-          Status toko belum diatur
-        </p>
-      </header>
-
-      <main id="beranda">
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-copy">
-            <p className="hero-kicker">Belanja dekat, belanja secukupnya</p>
-            <h1 id="hero-title">Kebutuhan rumah, ada di dekat sini.</h1>
-            <p className="hero-description">
-              Lihat katalog Toko Milano dan susun belanjaan harian Anda.
-            </p>
-            <a className="primary-link" href="#etalase">
-              Lihat katalog
-            </a>
-          </div>
-          <div className="hero-art" aria-hidden="true">
-            <span className="hero-sun" />
-            <div className="market-bag">
-              <span className="bag-handle" />
-              <span className="bag-label">MILANO</span>
-              <span className="bag-product bag-product-one" />
-              <span className="bag-product bag-product-two" />
-              <span className="bag-product bag-product-three" />
-            </div>
-            <p>Isi dapur, mulai dari yang perlu.</p>
-          </div>
-        </section>
-
-        <section className="delivery-note" aria-label="Informasi pengiriman">
-          <span className="delivery-icon" aria-hidden="true">
-            10
-          </span>
-          <p>
-            Aturan toko: gratis ongkir hingga 10 km. Penghitungan jarak belum
-            aktif di pratinjau ini.
-          </p>
-        </section>
-
+    <StoreShell activePage="etalase">
+      <main>
         <section className="catalog-section" id="etalase">
           <div className="section-heading">
             <div>
               <p className="section-kicker">Etalase</p>
-              <h2>Pilih yang dibutuhkan</h2>
+              <h1>Pilih yang dibutuhkan</h1>
             </div>
             <p className="sample-label">Katalog contoh</p>
           </div>
@@ -356,81 +251,17 @@ export default function Home() {
               </button>
             </div>
           )}
-        </section>
-
-        <section className="orders-section" id="pesanan">
-          <div className="section-heading">
-            <div>
-              <p className="section-kicker">Pesanan</p>
-              <h2>Riwayat belanja</h2>
-            </div>
-          </div>
-          <div className="empty-state orders-empty">
-            <h3>Belum ada riwayat pesanan</h3>
+          <section className="delivery-note" aria-label="Informasi pengiriman">
+            <span className="delivery-icon" aria-hidden="true">
+              10
+            </span>
             <p>
-              Riwayat pesanan akan tersedia setelah toko terhubung ke sistem
-              pemesanan.
+              Gratis ongkir hingga 10 km. Penghitungan jarak belum aktif di
+              pratinjau ini.
             </p>
-          </div>
-        </section>
-
-        <section className="profile-section" id="profil">
-          <div className="profile-intro">
-            <p className="section-kicker">Profil</p>
-            <h2>Data untuk pesanan Anda</h2>
-            <p>
-              Simpan nama dan nomor WhatsApp di perangkat ini agar mudah diisi
-              saat pemesanan tersedia.
-            </p>
-          </div>
-          <form className="profile-form" onSubmit={saveProfile}>
-            <label>
-              Nama lengkap
-              <input
-                type="text"
-                autoComplete="name"
-                value={profile.name}
-                disabled={!profileReady}
-                onChange={(event) => {
-                  setProfile({ ...profile, name: event.target.value });
-                  setProfileMessage("");
-                }}
-              />
-            </label>
-            <label>
-              Nomor WhatsApp
-              <input
-                type="tel"
-                autoComplete="tel"
-                inputMode="tel"
-                value={profile.whatsapp}
-                disabled={!profileReady}
-                onChange={(event) => {
-                  setProfile({ ...profile, whatsapp: event.target.value });
-                  setProfileMessage("");
-                }}
-              />
-            </label>
-            <button
-              className="save-button"
-              type="submit"
-              disabled={!profileReady}
-            >
-              Simpan profil
-            </button>
-            <p className="form-message" role="status" aria-live="polite">
-              {profileReady
-                ? profileMessage
-                : "Memuat profil dari perangkat..."}
-            </p>
-          </form>
+          </section>
         </section>
       </main>
-
-      <footer className="site-footer">
-        <p>Toko Milano</p>
-        <p>Harga dan ketersediaan perlu dikonfirmasi ke toko.</p>
-      </footer>
 
       {itemCount > 0 && (
         <aside className="cart-bar" aria-label="Ringkasan keranjang">
@@ -447,27 +278,6 @@ export default function Home() {
           </button>
         </aside>
       )}
-
-      <nav className="bottom-nav" aria-label="Navigasi utama">
-        <a href="#etalase">
-          <span className="nav-symbol" aria-hidden="true">
-            E
-          </span>
-          Etalase
-        </a>
-        <a href="#pesanan">
-          <span className="nav-symbol" aria-hidden="true">
-            P
-          </span>
-          Pesanan
-        </a>
-        <a href="#profil">
-          <span className="nav-symbol" aria-hidden="true">
-            D
-          </span>
-          Profil
-        </a>
-      </nav>
 
       <dialog
         className="cart-dialog"
@@ -532,6 +342,6 @@ export default function Home() {
           </div>
         )}
       </dialog>
-    </>
+    </StoreShell>
   );
 }
