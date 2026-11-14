@@ -16,17 +16,19 @@ const navigation: {
 
 export function StoreShell({
   activePage,
+  preview = true,
   children,
 }: {
   activePage: StorePage;
+  preview?: boolean;
   children: ReactNode;
 }) {
   return (
-    <>
-      {activePage === "etalase" && (
+    <div className="store-app">
+      {activePage === "etalase" && preview && (
         <div className="preview-notice">
           <p>
-            Pratinjau toko: produk, harga, dan stok di halaman ini adalah contoh.
+            Katalog contoh. Produk, harga, dan stok belum memakai data toko.
           </p>
         </div>
       )}
@@ -68,6 +70,6 @@ export function StoreShell({
           </Link>
         ))}
       </nav>
-    </>
+    </div>
   );
 }

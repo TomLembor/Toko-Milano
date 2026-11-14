@@ -2,8 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  categories,
-  isProduct,
+  isCatalogPayload,
   type Category,
   type Product,
 } from "@/lib/products";
@@ -21,6 +20,9 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<Category>("Semua");
   const [catalog, setCatalog] = useState<Product[]>([]);
+  const [catalogCategories, setCatalogCategories] =
+    useState<Category[]>(["Semua"]);
+  const [isPreview, setIsPreview] = useState<boolean | null>(null);
   const [catalogState, setCatalogState] = useState<
     "loading" | "ready" | "error"
   >("loading");
@@ -40,14 +42,19 @@ export default function Home() {
         if (!response.ok) throw new Error("Catalog request failed.");
 
         const payload: unknown = await response.json();
-        if (!Array.isArray(payload) || !payload.every(isProduct)) {
+        if (!isCatalogPayload(payload)) {
           throw new Error("Catalog response is invalid.");
         }
 
-        setCatalog(payload);
+        setCatalog(payload.products);
+        setCatalogCategories(["Semua", ...payload.categories]);
+        setIsPreview(payload.isPreview);
         setCatalogState("ready");
-      } catch {
+      } catch (error) {
         if (controller.signal.aborted) return;
+        console.error("Catalog request failed.", error);
+        setCatalogCategories(["Semua"]);
+        setIsPreview(false);
         setCatalogState("error");
       }
     }
@@ -91,7 +98,7 @@ export default function Home() {
         `- ${item.name} (${item.quantity}x): ${formatPrice(item.price * item.quantity)}`,
     ),
     "",
-    `Subtotal contoh: ${formatPrice(subtotal)}`,
+    `Subtotal${isPreview === true ? " contoh" : ""}: ${formatPrice(subtotal)}`,
     profile.name ? `Nama: ${profile.name}` : "",
     profile.whatsapp ? `No. WhatsApp: ${profile.whatsapp}` : "",
   ]
@@ -112,7 +119,7 @@ export default function Home() {
   }
 
   return (
-    <StoreShell activePage="etalase">
+    <StoreShell activePage="etalase" preview={isPreview === true}>
       <main>
         <section className="catalog-section" id="etalase">
           <div className="section-heading">
@@ -120,7 +127,9 @@ export default function Home() {
               <p className="section-kicker">Etalase</p>
               <h1>Pilih yang dibutuhkan</h1>
             </div>
-            <p className="sample-label">Katalog contoh</p>
+            {isPreview === true && (
+              <p className="sample-label">Katalog contoh</p>
+            )}
           </div>
 
           <search className="catalog-tools" aria-label="Cari dan pilih produk">
@@ -136,7 +145,7 @@ export default function Home() {
             <div className="category-area">
               <p id="category-label">Kategori</p>
               <div className="category-list" aria-labelledby="category-label">
-                {categories.map((category) => (
+                {catalogCategories.map((category) => (
                   <button
                     className="category-button"
                     type="button"
@@ -153,7 +162,7 @@ export default function Home() {
 
           {catalogState === "loading" ? (
             <p className="catalog-status" role="status" aria-live="polite">
-              Memuat katalog contoh...
+              Memuat katalog...
             </p>
           ) : catalogState === "error" ? (
             <div className="empty-state" role="alert">
@@ -185,7 +194,7 @@ export default function Home() {
                       <p className="product-unit">{product.unit}</p>
                       <p className="product-stock">
                         {product.stock > 0
-                          ? `Stok contoh: ${product.stock}`
+                          ? `${isPreview === true ? "Stok contoh" : "Stok"}: ${product.stock}`
                           : "Habis"}
                       </p>
                       <div className="product-buy-row">
@@ -247,7 +256,9 @@ export default function Home() {
                   setActiveCategory("Semua");
                 }}
               >
-                Tampilkan semua contoh barang
+                {isPreview === true
+                  ? "Tampilkan semua contoh barang"
+                  : "Tampilkan semua barang"}
               </button>
             </div>
           )}
@@ -256,8 +267,10 @@ export default function Home() {
               10
             </span>
             <p>
-              Gratis ongkir hingga 10 km. Penghitungan jarak belum aktif di
-              pratinjau ini.
+              Gratis ongkir hingga 10 km.{" "}
+              {isPreview === true
+                ? "Penghitungan jarak belum aktif di pratinjau ini."
+                : "Ongkos kirim perlu dikonfirmasi ke toko."}
             </p>
           </section>
         </section>
@@ -286,7 +299,9 @@ export default function Home() {
       >
         <form method="dialog" className="dialog-heading">
           <div>
-            <p className="section-kicker">Keranjang contoh</p>
+            <p className="section-kicker">
+              {isPreview === true ? "Keranjang contoh" : "Keranjang"}
+            </p>
             <h2 id="cart-title">Belanjaan Anda</h2>
           </div>
           <button
@@ -313,7 +328,7 @@ export default function Home() {
               ))}
             </ul>
             <div className="cart-total">
-              <span>Subtotal contoh</span>
+              <span>Subtotal{isPreview === true ? " contoh" : ""}</span>
               <strong>{formatPrice(subtotal)}</strong>
             </div>
             {whatsappHref ? (

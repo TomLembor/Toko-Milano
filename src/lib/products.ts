@@ -1,11 +1,4 @@
-export type Category =
-  | "Semua"
-  | "Sembako"
-  | "Minuman"
-  | "Makanan ringan"
-  | "Mandi & cuci"
-  | "Bumbu dapur"
-  | "Obat & lainnya";
+export type Category = string;
 
 export type Product = {
   id: string;
@@ -26,6 +19,12 @@ export const categories: Category[] = [
   "Bumbu dapur",
   "Obat & lainnya",
 ];
+
+export type CatalogPayload = {
+  products: Product[];
+  categories: Category[];
+  isPreview: boolean;
+};
 
 export const products: Product[] = [
   {
@@ -101,5 +100,19 @@ export function isProduct(value: unknown): value is Product {
     typeof value.category === "string" &&
     "mark" in value &&
     typeof value.mark === "string"
+  );
+}
+
+export function isCatalogPayload(value: unknown): value is CatalogPayload {
+  if (typeof value !== "object" || value === null) return false;
+  return (
+    "products" in value &&
+    Array.isArray(value.products) &&
+    value.products.every(isProduct) &&
+    "categories" in value &&
+    Array.isArray(value.categories) &&
+    value.categories.every((category) => typeof category === "string") &&
+    "isPreview" in value &&
+    typeof value.isPreview === "boolean"
   );
 }
