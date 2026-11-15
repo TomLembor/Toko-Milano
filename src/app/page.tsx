@@ -6,7 +6,7 @@ import {
   type Category,
   type Product,
 } from "@/lib/products";
-import { StoreShell } from "./store-shell";
+import { StoreIcon, StoreShell } from "./store-shell";
 import { useStorefrontState } from "./storefront-state";
 
 const formatPrice = (value: number) =>
@@ -263,8 +263,8 @@ export default function Home() {
             </div>
           )}
           <section className="delivery-note" aria-label="Informasi pengiriman">
-            <span className="delivery-icon" aria-hidden="true">
-              10
+            <span className="delivery-icon">
+              <StoreIcon name="pin" />
             </span>
             <p>
               Gratis ongkir hingga 10 km.{" "}

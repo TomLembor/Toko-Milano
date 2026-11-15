@@ -1,16 +1,16 @@
 :root {
   color-scheme: light;
-  --green: #24533d;
-  --green-deep: #173c2c;
-  --cream: #f7f5eb;
-  --paper: #fffef9;
-  --sage: #dce8d7;
-  --sage-dark: #54745e;
-  --ink: #1d2b22;
-  --muted: #4a5a4f;
-  --line: #748678;
-  --orange: #a9461e;
-  --orange-soft: #f3decf;
+  --green: #0549bd;
+  --green-deep: #010101;
+  --cream: #ffffff;
+  --paper: #ffffff;
+  --sage: #eae9ec;
+  --sage-dark: #505052;
+  --ink: #010101;
+  --muted: #525252;
+  --line: #808183;
+  --orange: #0549bd;
+  --orange-soft: #e6ecf8;
   --target-size: 44px;
 }
 
@@ -27,6 +27,7 @@ body {
   background: var(--cream);
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
+  font-size-adjust: from-font;
   font-size: 1rem;
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -132,9 +133,9 @@ main,
   place-items: center;
   border: 1px solid var(--green);
   border-radius: 0.75rem 0.75rem 0.75rem 0.2rem;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-oswald), "Arial Narrow", Arial, sans-serif;
   font-size: 1.35rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .brand strong,
@@ -143,8 +144,10 @@ main,
 }
 
 .brand strong {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.12rem;
+  font-family: var(--font-oswald), "Arial Narrow", Arial, sans-serif;
+  font-size: 1.25rem;
+  font-size-adjust: from-font;
+  font-weight: 600;
   line-height: 1.2;
 }
 
@@ -188,6 +191,9 @@ h1,
 h2,
 h3 {
   text-wrap: balance;
+  font-family: var(--font-oswald), "Arial Narrow", Arial, sans-serif;
+  font-size-adjust: from-font;
+  font-weight: 600;
 }
 
 .save-button,
@@ -222,14 +228,16 @@ h3 {
 
 .delivery-icon {
   display: grid;
-  flex: 0 0 2.8rem;
-  aspect-ratio: 1;
+  flex: 0 0 2.2rem;
+  width: 2.2rem;
+  height: 2.2rem;
   place-items: center;
-  border-radius: 50%;
-  background: var(--green);
-  color: white;
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 700;
+  color: var(--green);
+}
+
+.delivery-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .catalog-section,
@@ -252,11 +260,9 @@ h3 {
 .profile-intro h2,
 .dialog-heading h2 {
   margin: 0;
-  color: var(--green-deep);
-  font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink);
   font-size: clamp(1.8rem, 4vw, 2.6rem);
-  font-weight: 500;
-  letter-spacing: -0.035em;
+  letter-spacing: 0;
   line-height: 1.1;
 }
 
@@ -346,9 +352,7 @@ h3 {
 
 .product-card {
   min-width: 0;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 0.65rem;
+  border-bottom: 1px solid var(--line);
   background: var(--paper);
 }
 
@@ -363,9 +367,9 @@ h3 {
 }
 
 .placeholder-mark {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-oswald), "Arial Narrow", Arial, sans-serif;
   font-size: 2.65rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
 }
 
@@ -415,7 +419,9 @@ h3 {
   max-width: 100%;
   min-width: 0;
   margin: 0;
-  color: var(--green-deep);
+  color: var(--ink);
+  font-family: var(--font-oswald), "Arial Narrow", Arial, sans-serif;
+  font-size-adjust: from-font;
   font-size: clamp(0.9rem, 3.6vw, 1rem);
   font-weight: 700;
   overflow-wrap: anywhere;
@@ -466,8 +472,7 @@ h3 {
 
 .empty-state h3 {
   margin: 0;
-  color: var(--green-deep);
-  font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink);
   font-size: 1.35rem;
 }
 
@@ -623,20 +628,25 @@ h3 {
   text-decoration: none;
 }
 
-.bottom-nav a[aria-current="page"] .nav-symbol {
-  border-width: 2px;
-  background: var(--sage);
+.bottom-nav a[aria-current="page"] .nav-icon {
+  color: var(--green);
 }
 
-.nav-symbol {
+.bottom-nav a[aria-current="page"] {
+  color: var(--green);
+  font-weight: 800;
+}
+
+.nav-icon {
   display: grid;
-  width: 1.4rem;
-  aspect-ratio: 1;
+  width: 1.5rem;
+  height: 1.5rem;
   place-items: center;
-  border: 1px solid currentColor;
-  border-radius: 0.35rem 0.35rem 0.35rem 0.1rem;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 0.78rem;
+}
+
+.nav-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .cart-dialog {
@@ -652,6 +662,22 @@ h3 {
 
 .cart-dialog::backdrop {
   background: rgb(20 35 26 / 52%);
+}
+
+@media (forced-colors: active) {
+  :root {
+    --green: LinkText;
+    --green-deep: CanvasText;
+    --cream: Canvas;
+    --paper: Canvas;
+    --sage: Canvas;
+    --sage-dark: CanvasText;
+    --ink: CanvasText;
+    --muted: CanvasText;
+    --line: CanvasText;
+    --orange: Highlight;
+    --orange-soft: Highlight;
+  }
 }
 
 .dialog-heading {
@@ -830,6 +856,16 @@ h3 {
 
   .bottom-nav a {
     font-size: clamp(0.6rem, 3.5vw, 0.75rem);
+  }
+}
+
+@supports not (font-size-adjust: from-font) {
+  h1,
+  h2,
+  h3,
+  .brand strong,
+  .product-price {
+    line-height: 1.15;
   }
 }
 
