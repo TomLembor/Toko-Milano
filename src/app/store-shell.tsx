@@ -16,23 +16,13 @@ const navigation: {
 
 export function StoreShell({
   activePage,
-  preview = true,
   children,
 }: {
   activePage: StorePage;
-  preview?: boolean;
   children: ReactNode;
 }) {
   return (
     <div className="store-app">
-      {activePage === "etalase" && preview && (
-        <div className="preview-notice">
-          <p>
-            Katalog contoh. Produk, harga, dan stok belum memakai data toko.
-          </p>
-        </div>
-      )}
-
       <header className="site-header">
         <Link className="brand" href="/" aria-label="Toko Milano, ke beranda">
           <span className="brand-mark" aria-hidden="true">

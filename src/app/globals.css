@@ -98,20 +98,8 @@ button:disabled {
   opacity: 0.62;
 }
 
-.preview-notice {
-  padding: 0.55rem 1rem;
-  background: var(--green-deep);
-  color: var(--paper);
-  text-align: center;
-  font-size: 0.875rem;
-}
-
 .store-app {
   padding-block-end: 10rem;
-}
-
-.preview-notice p {
-  margin: 0;
 }
 
 .site-header,

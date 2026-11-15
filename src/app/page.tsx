@@ -119,7 +119,7 @@ export default function Home() {
   }
 
   return (
-    <StoreShell activePage="etalase" preview={isPreview === true}>
+    <StoreShell activePage="etalase">
       <main>
         <section className="catalog-section" id="etalase">
           <div className="section-heading">
